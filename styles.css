@@ -1,0 +1,121 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+.map {
+    width: 100%;
+    height: 100%;
+}
+
+.map-title {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(255, 255, 255);
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 2px solid darkblue;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(20, 20, 218);
+    z-index: 1000;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.layers-control {
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    z-index: 1000;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #5b46e7;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: 2px solid rgb(234, 234, 243);
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.dropbtn:hover {
+    background-color: #9ce49f;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.dropdown-content {
+    display: none;
+    position: left;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    max-height: 0;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s, padding 0.3s;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    padding-left: 20px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    max-height: 500px;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #3e8e41;
+}
+
+.legend {
+    position: absolute;
+    bottom: 10px;
+    left: 1px;
+    background: white;
+    padding: 5px;
+    border-radius: 4px;
+    border: 2px solid darkblue; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #000;
+}
+
+

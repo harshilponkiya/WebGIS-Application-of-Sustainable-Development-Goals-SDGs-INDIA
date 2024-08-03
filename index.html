@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenLayers using HTML and CQL Filters</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+
+    <style>
+
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Roboto', Arial, Helvetica, sans-serif;
+        }
+
+        .mapstyle {
+            height: 100vh;
+            width: 100vw;
+            display: none;
+        }
+
+        #map {
+            display: block;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 10px;
+            left: 0px;
+            background: rgb(157, 154, 226);
+            padding: 5px;
+            border-radius: 4px;
+            border: 4px solid darkblue;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 40%;
+            border: 1px solid #000;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: rgb(58, 162, 227);
+            padding: 10px;
+            border: 3px solid #1f0857;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-style {
+            color: #f4f9f9;
+            font-size: large;
+            font-weight: bold;
+        }
+
+        .controls label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .controls select {
+            width: 200px;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .controls input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        .controls button {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: #a8adac;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .controls button:hover {
+            background-color: #04382d;
+        }
+
+        .ol-popup {
+            position: fixed;
+            background-color: rgb(157, 201, 230);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 5px;
+            border: 5px solid #1d0101;
+            bottom: 12px;
+            left: -50px;
+            width: 250px;
+        }
+
+        .ol-popup:after,
+        .ol-popup:before {
+            top: 100%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .ol-popup:after {
+            border-top-color: white;
+            border-width: 5px;
+            left: 48px;
+            margin-left: -10px;
+        }
+
+        .ol-popup:before {
+            border-top-color: #cccccc;
+            border-width: 11px;
+            left: 48px;
+            margin-left: -11px;
+        }
+
+        .ol-popup-closer {
+            text-decoration: none;
+            position: absolute;
+            top: 2px;
+            right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map_osm" class="mapstyle"></div>
+    <div id="map_np" class="mapstyle"></div>
+    <div id="map_zh" class="mapstyle"></div>
+    <div id="map_ge" class="mapstyle"></div>
+    <div id="map_qe" class="mapstyle"></div>
+    <div id="map_gh" class="mapstyle"></div>
+    <div id="map_cs" class="mapstyle"></div>
+
+    <div class="controls">
+        <label class="control-style">Select Layer</label>
+        <!-- <label><input type="radio" name="layer" value="map_osm" onclick="applyMap()">Default OSM</label> -->
+        <label><input type="radio" name="layer" value="map_np" onclick="applyMap()">No Poverty</label>
+        <label><input type="radio" name="layer" value="map_zh" onclick="applyMap()">Zero Hunger</label>
+        <label><input type="radio" name="layer" value="map_ge" onclick="applyMap()">Gender Equality</label>
+        <label><input type="radio" name="layer" value="map_qe" onclick="applyMap()">Quality Education</label>
+        <label><input type="radio" name="layer" value="map_gh" onclick="applyMap()">Good Health</label>
+        <!-- <label><input type="radio" name="layer" value="Clear Selection" onclick="applyMap()">Clear Selection</label> -->
+    </div>
+
+    <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer">✖</a>
+        <div id="popup-content"></div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <span class="legend-color" style="background-color: #5ffbe9;"></span>Achiever (100)
+        </div>
+        <div class="legend-item">
+            <span class="legend-color" style="background-color: #85b66f;"></span>Front Runner (65 - 99.99)
+        </div>
+        <div class="legend-item">
+            <span class="legend-color" style="background-color: #fcf538;"></span>Performer (50 - 64.99)
+        </div>
+        <div class="legend-item">
+            <span class="legend-color" style="background-color: #fb001d;"></span>Aspirant (0 - 49.99)
+        </div>
+    </div>
+
+    <script src="no_poverty.js"></script>
+    <script src="zero_hunger.js"></script>
+    <script src="good_health.js"></script>
+    <script src="gender_equality.js"></script>
+    <script src="quality_education.js"></script>
+    <script>
+        var map_osm = new ol.Map({
+            target: 'map_osm',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([78.9629, 20.5937]),
+                zoom: 4.5
+            })
+        });
+
+        function applyMap() {
+            // Hide all maps
+            document.querySelectorAll('.mapstyle').forEach(map => map.style.display = 'none');
+
+            // Get the selected map
+            var selectedMap = document.querySelector('input[name="layer"]:checked').value;
+            console.log(selectedMap)
+            if (selectedMap === 'map_np') {
+                popupnp(map_np, geoserverLayerSourcenp);
+            } else if (selectedMap === 'map_zh') {
+                popupzh(map_zh, geoserverLayerSourcezh);
+            } else if (selectedMap === 'map_gh') {
+                popupgh(map_gh, geoserverLayerSourcegh);
+            } else if (selectedMap === 'map_ge') {
+                popupge(map_ge, geoserverLayerSourcege);
+            } else if (selectedMap === 'map_qe') {
+                popupqe(map_qe, geoserverLayerSourceqe);
+            } else if (selectedMap === 'map_osm') {
+                map_osm.updateSize(); // Update size to ensure proper rendering
+            }
+            document.getElementById(selectedMap).style.display = 'block';
+        }
+
+        // Show the OSM map by default
+        document.getElementById('map_osm').style.display = 'block';
+    </script>
+</body>
+
+</html>
